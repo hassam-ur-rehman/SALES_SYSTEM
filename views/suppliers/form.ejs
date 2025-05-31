@@ -1,0 +1,48 @@
+<%- include('../partials/header', { title: title }) %>
+
+<h2><%= title %></h2>
+
+<% if (typeof error_msg !== 'undefined' && error_msg) { %>
+    <p style="color: red; border: 1px solid red; padding: 10px; margin-bottom: 15px;"><%= error_msg %></p>
+<% } %>
+<% if (typeof form_data !== 'undefined' && Object.keys(form_data).length > 0 && typeof error_msg !== 'undefined') { %>
+    <p style="background-color: #fff3cd; border: 1px solid #ffeeba; color: #856404; padding: 10px; margin-bottom:15px;">
+        Please correct the errors. Your input has been retained.
+    </p>
+<% } %>
+
+<% const pathForReturnLinks = typeof currentPath !== 'undefined' ? currentPath : (action.includes('/add') ? '/items/add' : '/suppliers'); %>
+
+<form action="<%= action %>" method="POST" style="max-width: 600px; margin-top: 20px; padding: 20px; border: 1px solid #ddd; background-color: #f9f9f9; border-radius: 5px;">
+    <div style="margin-bottom: 15px;">
+        <label for="supplier_name" style="display: block; margin-bottom: 5px; font-weight: bold;">Supplier Name*:</label>
+        <input type="text" id="supplier_name" name="supplier_name" value="<%= (typeof form_data !== 'undefined' && form_data.supplier_name) ? form_data.supplier_name : (typeof supplier !== 'undefined' ? supplier.supplier_name : '') %>" required style="width: calc(100% - 18px); padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+    </div>
+
+    <div style="margin-bottom: 15px;">
+        <label for="contact_person" style="display: block; margin-bottom: 5px; font-weight: bold;">Contact Person:</label>
+        <input type="text" id="contact_person" name="contact_person" value="<%= (typeof form_data !== 'undefined' && form_data.contact_person) ? form_data.contact_person : (typeof supplier !== 'undefined' ? supplier.contact_person : '') %>" style="width: calc(100% - 18px); padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+    </div>
+
+    <div style="margin-bottom: 15px;">
+        <label for="email" style="display: block; margin-bottom: 5px; font-weight: bold;">Email:</label>
+        <input type="email" id="email" name="email" value="<%= (typeof form_data !== 'undefined' && form_data.email) ? form_data.email : (typeof supplier !== 'undefined' ? supplier.email : '') %>" style="width: calc(100% - 18px); padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+    </div>
+
+    <div style="margin-bottom: 15px;">
+        <label for="phone" style="display: block; margin-bottom: 5px; font-weight: bold;">Phone:</label>
+        <input type="text" id="phone" name="phone" value="<%= (typeof form_data !== 'undefined' && form_data.phone) ? form_data.phone : (typeof supplier !== 'undefined' ? supplier.phone : '') %>" style="width: calc(100% - 18px); padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+    </div>
+
+    <div style="margin-bottom: 20px;">
+        <label for="address" style="display: block; margin-bottom: 5px; font-weight: bold;">Address:</label>
+        <textarea id="address" name="address" style="width: calc(100% - 18px); padding: 8px; border: 1px solid #ccc; border-radius: 4px; min-height: 80px;"><%= (typeof form_data !== 'undefined' && form_data.address) ? form_data.address : (typeof supplier !== 'undefined' ? supplier.address : '') %></textarea>
+    </div>
+
+    <div style="padding-top: 10px;">
+        <button type="submit" style="padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;"><%= submitButtonText %></button>
+        <a href="<%= pathForReturnLinks %>" style="margin-left: 15px; text-decoration: none; color: #007bff; padding: 10px 15px; border: 1px solid #007bff; border-radius: 5px;">Cancel</a>
+    </div>
+</form>
+
+<%- include('../partials/footer') %>

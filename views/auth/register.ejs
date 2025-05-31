@@ -1,0 +1,38 @@
+<%- include('../partials/header', { title: title }) %>
+
+<div style="max-width: 450px; margin: 50px auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; background-color: #f9f9f9;">
+    <h2><%= title %></h2>
+
+    <% if (typeof error_msg !== 'undefined' && error_msg) { %>
+        <p style="color: red; border: 1px solid red; padding: 10px; margin-bottom: 15px;"><%= error_msg %></p>
+    <% } %>
+    <% if (typeof success_msg !== 'undefined' && success_msg) { %>
+        <p style="color: green; border: 1px solid green; padding: 10px; margin-bottom: 15px;"><%= success_msg %></p>
+    <% } %>
+
+    <form action="/auth/register" method="POST">
+        <div style="margin-bottom: 15px;">
+            <label for="full_name" style="display: block; margin-bottom: 5px; font-weight: bold;">Full Name:</label>
+            <input type="text" id="full_name" name="full_name" value="<%= typeof form_data !== 'undefined' && form_data.full_name ? form_data.full_name : '' %>" required style="width: calc(100% - 18px); padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+        </div>
+        <div style="margin-bottom: 15px;">
+            <label for="username" style="display: block; margin-bottom: 5px; font-weight: bold;">Username*:</label>
+            <input type="text" id="username" name="username" value="<%= typeof form_data !== 'undefined' && form_data.username ? form_data.username : '' %>" required style="width: calc(100% - 18px); padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+        </div>
+        <div style="margin-bottom: 15px;">
+            <label for="password" style="display: block; margin-bottom: 5px; font-weight: bold;">Password*:</label>
+            <input type="password" id="password" name="password" required style="width: calc(100% - 18px); padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+        </div>
+        <div style="margin-bottom: 20px;">
+            <label for="confirm_password" style="display: block; margin-bottom: 5px; font-weight: bold;">Confirm Password*:</label>
+            <input type="password" id="confirm_password" name="confirm_password" required style="width: calc(100% - 18px); padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+        </div>
+        <%# You might want to assign a default role or have a dropdown if different roles can self-register %>
+        <%# For now, we'll assign a default role like 'staff' in the backend %>
+
+        <button type="submit" style="width: 100%; padding: 10px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">Register</button>
+    </form>
+    <p style="text-align: center; margin-top: 15px;">Already have an account? <a href="/auth/login">Login here</a></p>
+</div>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,38 @@
+/* dbms project 2.0/public/css/style.css */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #eef1f5;
+    color: #333a45;
+    line-height: 1.6;
+}
+.container {
+    width: 80%;
+    margin: auto;
+    overflow: hidden;
+    padding: 0 20px;
+}
+header#main-header {
+    background-color: #35424a;
+    color: #ffffff;
+    padding-top: 30px;
+    min-height: 70px;
+    border-bottom: #0779e4 3px solid;
+}
+header#main-header h1 {
+    text-align: center;
+    margin: 0;
+    font-size: 28px;
+}
+main#content {
+    padding: 20px 0;
+    min-height: calc(100vh - 73px - 73px); /* Full height minus header and footer */
+}
+footer#main-footer {
+    background: #35424a;
+    color: #ffffff;
+    text-align: center;
+    padding: 20px;
+    margin-top: 20px;
+}

@@ -1,0 +1,259 @@
+<%- include('../partials/header', { title: title }) %>
+
+<h2><%= title %></h2>
+
+<% if (typeof error_msg !== 'undefined' && error_msg) { %>
+    <p style="color: red; border: 1px solid red; padding: 10px; margin-bottom: 15px;"><%= error_msg %></p>
+<% } %>
+<% if (typeof form_data !== 'undefined' && Object.keys(form_data).length > 0 && typeof error_msg !== 'undefined' && error_msg.toLowerCase().includes('required')) { %>
+    <p style="background-color: #fff3cd; border: 1px solid #ffeeba; color: #856404; padding: 10px; margin-bottom:15px;">
+        Please correct the errors. Your previous input has been retained where possible.
+    </p>
+<% } %>
+
+<form id="saleForm" action="<%= action %>" method="POST" style="max-width: 900px; margin-top: 20px;">
+
+    <fieldset style="margin-bottom: 20px; padding: 15px; border: 1px solid #ccc;">
+        <legend style="font-weight: bold; padding: 0 5px;">Sale Details</legend>
+
+        <div style="display: flex; gap: 20px; margin-bottom: 15px;">
+            <div style="flex: 1;">
+                <label for="customer_id" style="display: block; margin-bottom: 5px;">Customer (Optional):</label>
+                <select id="customer_id" name="customer_id" style="width: 100%; padding: 8px;">
+                    <option value="">-- Guest Sale --</option>
+                    <% if (typeof customers !== 'undefined' && customers.length > 0) { %>
+                        <% customers.forEach(cust => { %>
+                            <option value="<%= cust.customer_id %>"
+                                <%= (typeof form_data !== 'undefined' && form_data.customer_id == cust.customer_id) ? 'selected' : ( (typeof sale !== 'undefined' && sale.customer_id == cust.customer_id) ? 'selected' : '' ) %>>
+                                <%= cust.first_name %> <%= cust.last_name || '' %> (ID: <%= cust.customer_id %>)
+                            </option>
+                        <% }) %>
+                    <% } %>
+                </select>
+            </div>
+            <div style="flex: 1;">
+                <label for="user_id" style="display: block; margin-bottom: 5px;">Processing User*:</label>
+                <select id="user_id" name="user_id" required style="width: 100%; padding: 8px;">
+                    <option value="">-- Select User --</option>
+                    <% if (typeof users !== 'undefined' && users.length > 0) { %>
+                        <% users.forEach(user => { %>
+                            <option value="<%= user.user_id %>"
+                                <%= (typeof form_data !== 'undefined' && form_data.user_id == user.user_id) ? 'selected' : ( (typeof sale !== 'undefined' && sale.user_id == user.user_id) ? 'selected' : '' ) %>>
+                                <%= user.full_name || user.username %>
+                            </option>
+                        <% }) %>
+                    <% } %>
+                </select>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 20px; margin-bottom: 15px;">
+            <div style="flex: 1;">
+                <label for="sale_type" style="display: block; margin-bottom: 5px;">Sale Type*:</label>
+                <select id="sale_type" name="sale_type" required style="width: 100%; padding: 8px;">
+                    <option value="retail" <%= ( (typeof form_data !== 'undefined' && form_data.sale_type === 'retail') || (typeof sale !== 'undefined' && sale.sale_type === 'retail' && (typeof form_data === 'undefined' || !form_data.sale_type) ) ) ? 'selected' : '' %>>Retail</option>
+                    <option value="wholesale" <%= ( (typeof form_data !== 'undefined' && form_data.sale_type === 'wholesale') || (typeof sale !== 'undefined' && sale.sale_type === 'wholesale' && (typeof form_data === 'undefined' || !form_data.sale_type) ) ) ? 'selected' : '' %>>Wholesale</option>
+                </select>
+            </div>
+            <div style="flex: 1;">
+                <label for="payment_method" style="display: block; margin-bottom: 5px;">Payment Method:</label>
+                <input type="text" id="payment_method" name="payment_method" value="<%= typeof form_data !== 'undefined' && form_data.payment_method ? form_data.payment_method : (typeof sale !== 'undefined' ? sale.payment_method : '') %>" style="width: calc(100% - 18px); padding: 8px;">
+            </div>
+        </div>
+         <div style="margin-bottom: 15px;">
+            <label for="sale_date_display" style="display: block; margin-bottom: 5px;">Sale Date (auto):</label>
+            <input type="text" id="sale_date_display" name="sale_date_display" value="<%= new Date().toLocaleDateString() %>" disabled style="width: calc(100% - 18px); padding: 8px; background-color: #eee;">
+        </div>
+    </fieldset>
+
+    <fieldset style="margin-bottom: 20px; padding: 15px; border: 1px solid #ccc;">
+        <legend style="font-weight: bold; padding: 0 5px;">Sale Items</legend>
+        <div style="margin-bottom: 15px; display: flex; gap: 10px; align-items: flex-end;">
+            <div style="flex-grow: 3;">
+                <label for="item_select" style="display: block; margin-bottom: 5px;">Select Item:</label>
+                <select id="item_select" style="width: 100%; padding: 8px;">
+                    <option value="">-- Choose an Item --</option>
+                    <% if (typeof itemsForSale !== 'undefined' && itemsForSale.length > 0) { %>
+                        <% itemsForSale.forEach(itm => { %>
+                            <option value="<%= itm.item_id %>"
+                                data-name="<%= itm.item_name %>"
+                                data-sku="<%= itm.sku || '' %>"
+                                data-retail-price="<%= itm.retail_price %>"
+                                data-wholesale-price="<%= itm.wholesale_price || itm.retail_price %>"
+                                data-stock="<%= itm.stock_quantity %>">
+                                <%= itm.item_name %> (SKU: <%= itm.sku || 'N/A' %>, Stock: <%= itm.stock_quantity %>)
+                            </option>
+                        <% }); %>
+                    <% } else { %>
+                        <option value="" disabled>No items available or in stock</option>
+                    <% } %>
+                </select>
+            </div>
+            <div style="flex-grow: 1;">
+                <label for="item_quantity" style="display: block; margin-bottom: 5px;">Quantity:</label>
+                <input type="number" id="item_quantity" value="1" min="1" style="width: calc(100% - 18px); padding: 8px;">
+            </div>
+            <div>
+                <button type="button" id="addItemToSaleBtn" style="padding: 8px 15px; background-color: #5cb85c; color: white; border:none; border-radius: 4px;">Add to Sale</button>
+            </div>
+        </div>
+
+        <table id="saleItemsTable" style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+            <thead>
+                <tr style="background-color: #f9f9f9;">
+                    <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Item</th>
+                    <th style="padding: 8px; border: 1px solid #ddd; text-align: right;">Qty</th>
+                    <th style="padding: 8px; border: 1px solid #ddd; text-align: right;">Unit Price</th>
+                    <th style="padding: 8px; border: 1px solid #ddd; text-align: right;">Subtotal</th>
+                    <th style="padding: 8px; border: 1px solid #ddd; text-align: center;">Action</th>
+                </tr>
+            </thead>
+            <tbody id="saleItemsTbody">
+                <%# Sale items will be added here by JavaScript %>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3" style="text-align: right; font-weight: bold; padding: 8px; border: 1px solid #ddd;">Total:</td>
+                    <td id="saleTotalAmount" style="text-align: right; font-weight: bold; padding: 8px; border: 1px solid #ddd;">0.00</td>
+                    <td style="border: 1px solid #ddd;"></td>
+                </tr>
+            </tfoot>
+        </table>
+        <div id="hiddenSaleItemsContainer"></div>
+    </fieldset>
+
+    <div style="margin-bottom: 15px;">
+        <label for="notes" style="display: block; margin-bottom: 5px;">Notes (Optional):</label>
+        <textarea id="notes" name="notes" style="width: calc(100% - 18px); padding: 8px; min-height: 60px;"><%= typeof form_data !== 'undefined' && form_data.notes ? form_data.notes : (typeof sale !== 'undefined' ? sale.notes : '') %></textarea>
+    </div>
+
+    <div style="padding-top: 10px;">
+        <button type="submit" id="submitSaleBtn" style="padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;"><%= submitButtonText %></button>
+        <a href="/sales" style="margin-left: 15px; text-decoration: none; color: #007bff; padding: 10px 15px; border: 1px solid #007bff; border-radius: 5px;">Cancel Sale</a>
+    </div>
+</form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const addItemBtn = document.getElementById('addItemToSaleBtn');
+        const itemSelect = document.getElementById('item_select');
+        const itemQuantityInput = document.getElementById('item_quantity');
+        const saleItemsTbody = document.getElementById('saleItemsTbody');
+        const saleTotalAmountCell = document.getElementById('saleTotalAmount');
+        const saleTypeSelect = document.getElementById('sale_type');
+        const hiddenSaleItemsContainer = document.getElementById('hiddenSaleItemsContainer');
+        const saleForm = document.getElementById('saleForm');
+
+        let saleItemsArray = [];
+
+        function renderSaleItems() {
+            saleItemsTbody.innerHTML = '';
+            let currentSaleTotal = 0;
+            saleItemsArray.forEach((item, index) => {
+                const row = saleItemsTbody.insertRow();
+                row.insertCell().textContent = `${item.name} (SKU: ${item.sku || 'N/A'})`;
+                row.insertCell().textContent = item.quantity;
+                row.cells[1].style.textAlign = 'right';
+                row.insertCell().textContent = parseFloat(item.unit_price).toFixed(2); // Ensure toFixed is on a number
+                row.cells[2].style.textAlign = 'right';
+                row.insertCell().textContent = parseFloat(item.subtotal).toFixed(2); // Ensure toFixed is on a number
+                row.cells[3].style.textAlign = 'right';
+                const actionCell = row.insertCell();
+                actionCell.style.textAlign = 'center';
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.textContent = 'Remove';
+                removeBtn.style.cssText = 'color:red; background:none; border:none; cursor:pointer; padding:0; font-size:inherit;';
+                removeBtn.onclick = () => {
+                    saleItemsArray.splice(index, 1);
+                    renderSaleItems();
+                };
+                actionCell.appendChild(removeBtn);
+                currentSaleTotal += parseFloat(item.subtotal);
+            });
+            saleTotalAmountCell.textContent = currentSaleTotal.toFixed(2);
+        }
+
+        addItemBtn.addEventListener('click', () => {
+            const selectedOption = itemSelect.options[itemSelect.selectedIndex];
+            if (!selectedOption || !selectedOption.value) {
+                alert('Please select an item.');
+                return;
+            }
+            const itemId = selectedOption.value;
+            const quantity = parseInt(itemQuantityInput.value);
+
+            if (isNaN(quantity) || quantity <= 0) {
+                alert('Please enter a valid quantity.');
+                return;
+            }
+
+            const stock = parseInt(selectedOption.dataset.stock);
+            const itemName = selectedOption.dataset.name;
+            const itemSku = selectedOption.dataset.sku;
+            const saleType = saleTypeSelect.value;
+            const retailPrice = parseFloat(selectedOption.dataset.retailPrice);
+            const wholesalePrice = selectedOption.dataset.wholesalePrice ? parseFloat(selectedOption.dataset.wholesalePrice) : retailPrice;
+            const unitPrice = saleType === 'wholesale' ? wholesalePrice : retailPrice;
+
+            const existingItemIndex = saleItemsArray.findIndex(itm => itm.id === itemId);
+
+            if (existingItemIndex > -1) {
+                const newQuantity = saleItemsArray[existingItemIndex].quantity + quantity;
+                if (newQuantity > stock) {
+                    alert(`Cannot add ${quantity} more of ${itemName}. Total quantity (${newQuantity}) would exceed stock (${stock}).`);
+                    return;
+                }
+                saleItemsArray[existingItemIndex].quantity = newQuantity;
+                saleItemsArray[existingItemIndex].subtotal = newQuantity * unitPrice;
+            } else {
+                if (quantity > stock) {
+                    alert(`Cannot add ${quantity} of ${itemName}. Only ${stock} in stock.`);
+                    return;
+                }
+                saleItemsArray.push({
+                    id: itemId, // Will be mapped to item_id for backend
+                    name: itemName,
+                    sku: itemSku,
+                    quantity: quantity, // Will be mapped to quantity_sold
+                    unit_price: unitPrice, // Will be mapped to unit_price_at_sale
+                    subtotal: quantity * unitPrice,
+                    stock: stock // Not sent to backend, for client-side validation
+                });
+            }
+            renderSaleItems();
+            itemSelect.value = '';
+            itemQuantityInput.value = '1';
+        });
+
+        saleForm.addEventListener('submit', function(event) {
+            hiddenSaleItemsContainer.innerHTML = '';
+            if (saleItemsArray.length === 0) {
+                alert('Please add at least one item to the sale.');
+                event.preventDefault();
+                return;
+            }
+            saleItemsArray.forEach((item, index) => {
+                // These are the fields the backend POST /sales/add expects for each sale_item
+                const backendItem = {
+                    item_id: item.id,
+                    quantity_sold: item.quantity,
+                    unit_price_at_sale: item.unit_price,
+                    subtotal: item.subtotal // Backend might recalculate, but good to send
+                };
+
+                for (const key in backendItem) {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    // This naming convention is crucial for Express/body-parser to create req.body.sale_items array
+                    input.name = `sale_items[${index}][${key}]`;
+                    input.value = backendItem[key];
+                    hiddenSaleItemsContainer.appendChild(input);
+                }
+            });
+            // No need to send calculated_total_amount from client; server will and should calculate it.
+        });
+    });
+</script>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,52 @@
+<%- include('../partials/header', { title: title }) %>
+
+<h2><%= title %></h2>
+
+<% if (typeof success_msg !== 'undefined' && success_msg) { %>
+    <p style="color: green; border: 1px solid green; padding: 10px; margin-bottom: 15px;"><%= success_msg %></p>
+<% } %>
+<% if (typeof error_msg !== 'undefined' && error_msg) { %>
+    <p style="color: red; border: 1px solid red; padding: 10px; margin-bottom: 15px;"><%= error_msg %></p>
+<% } %>
+
+<p style="margin-bottom: 20px;">
+    <a href="/sales/add" style="padding: 10px 15px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">Create New Sale</a>
+</p>
+
+<% if (sales && sales.length > 0) { %>
+    <table border="1" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+        <thead>
+            <tr style="background-color: #f2f2f2;">
+                <th style="padding: 8px; text-align: left;">Sale ID</th>
+                <th style="padding: 8px; text-align: left;">Date</th>
+                <th style="padding: 8px; text-align: left;">Customer</th>
+                <th style="padding: 8px; text-align: left;">User</th>
+                <th style="padding: 8px; text-align: left;">Type</th>
+                <th style="padding: 8px; text-align: left;">Payment Method</th>
+                <th style="padding: 8px; text-align: right;">Total Amount</th>
+                <th style="padding: 8px; text-align: center;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% sales.forEach(sale => { %>
+                <tr>
+                    <td style="padding: 8px;"><%= sale.sale_id %></td>
+                    <td style="padding: 8px;"><%= new Date(sale.sale_date).toLocaleString() %></td>
+                    <td style="padding: 8px;"><%= sale.customer_name || 'N/A (Guest)' %></td>
+                    <td style="padding: 8px;"><%= sale.user_username %></td>
+                    <td style="padding: 8px;"><%= sale.sale_type %></td>
+                    <td style="padding: 8px;"><%= sale.payment_method || 'N/A' %></td>
+                    <td style="padding: 8px; text-align: right;"><%= sale.total_amount.toFixed(2) %></td>
+                    <td style="padding: 8px; text-align: center;">
+                        <a href="/sales/view/<%= sale.sale_id %>" style="text-decoration: none; color: #17a2b8;">View Details</a>
+                        <%# Edit/Cancel Sale links could go here later %>
+                    </td>
+                </tr>
+            <% }) %>
+        </tbody>
+    </table>
+<% } else { %>
+    <p>No sales records found. <a href="/sales/add">Create one?</a></p>
+<% } %>
+
+<%- include('../partials/footer') %>

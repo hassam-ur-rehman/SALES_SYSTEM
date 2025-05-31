@@ -1,0 +1,50 @@
+<%- include('../partials/header', { title: title }) %>
+
+<h2><%= title %></h2>
+
+<% if (typeof success_msg !== 'undefined' && success_msg) { %>
+    <p style="color: green; border: 1px solid green; padding: 10px; margin-bottom: 15px;"><%= success_msg %></p>
+<% } %>
+<% if (typeof error_msg !== 'undefined' && error_msg) { %>
+    <p style="color: red; border: 1px solid red; padding: 10px; margin-bottom: 15px;"><%= error_msg %></p>
+<% } %>
+
+<p style="margin-bottom: 20px;">
+    <a href="/categories/add" style="padding: 10px 15px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">Add New Category</a>
+</p>
+
+<% if (categories && categories.length > 0) { %>
+    <table border="1" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+        <thead>
+            <tr style="background-color: #f2f2f2;">
+                <th style="padding: 8px; text-align: left;">Category Name</th>
+                <th style="padding: 8px; text-align: left;">Description</th>
+                <th style="padding: 8px; text-align: center;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% categories.forEach(category => { %>
+                <%
+                    // Prepare the category name for safe injection into a JavaScript string literal
+                    let categoryNameForJS = String(category.category_name || 'this category').replace(/'/g, "\\'"); // Escape single quotes
+                    categoryNameForJS = categoryNameForJS.replace(/\\/g, "\\\\"); // Escape backslashes
+                %>
+                <tr>
+                    <td style="padding: 8px;"><%= category.category_name %></td>
+                    <td style="padding: 8px;"><%= category.description || 'N/A' %></td>
+                    <td style="padding: 8px; text-align: center;">
+                        <a href="/categories/edit/<%= category.category_id %>" style="text-decoration: none; color: #17a2b8; margin-right: 10px;">Edit</a>
+                        <form action="/categories/delete/<%= category.category_id %>" method="POST" style="display:inline;"
+                              onsubmit="return confirm('Are you sure you want to delete category: \'<%= categoryNameForJS %>\'? This cannot be undone.');">
+                            <button type="submit" style="background:none; border:none; color:red; cursor:pointer; padding:0; font-size:inherit; text-decoration: underline;">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            <% }) %>
+        </tbody>
+    </table>
+<% } else { %>
+    <p>No categories found. <a href="/categories/add">Add one?</a></p>
+<% } %>
+
+<%- include('../partials/footer') %>
